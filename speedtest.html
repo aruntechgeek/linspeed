@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speed test</title>
+    <meta name="viewport" content="user-scalable=no, width=device-width, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <script src="http://speedof.me/api/api.js" type="text/javascript"></script>
+</head>
+<body>
+    <h2>Speed test</h2>
+
+    <button onclick="SomApi.startTest()">Start Test</button>
+    <div id="status">loaded</div>
+
+	<!-- success -->
+	<div id="download"></div>
+	<div id="upload"></div>
+	<!-- progress -->
+	<div id="type"></div>
+	<div id="pass"></div>
+	<div id="percentDone"></div>
+	<div id="currentSpeed"></div>
+	<!-- error -->
+	<div id="code"></div>
+	<div id="message"></div>
+
+    
+    <script type="text/javascript">
+		function getDomain(url)
+		{
+			return url.match(/:\/\/(www\.)?(.[^/:]+)/)[2];
+		}
+
+        SomApi.account = ""; //your API Key here
+        SomApi.domainName = getDomain(document.URL);     //your domain or sub-domain here
+        // SomApi.onTestCompleted = resp_handler("success"); // doesn't work on qtwebkit
+        SomApi.onError = resp_handler("error");
+        SomApi.onProgress = resp_handler("progress");
+
+		//set config values
+		SomApi.config.sustainTime = "8";
+		SomApi.config.testServerEnabled = false;
+		SomApi.config.userInfoEnabled = false;
+		SomApi.config.latencyTestEnabled = false;
+		SomApi.config.uploadTestEnabled = true;
+		SomApi.config.progress.enabled = true;
+		SomApi.config.progress.verbose = true;
+
+		function objToDom(data) {
+			for(prop in data) {
+				var node = document.getElementById(prop);
+				if(node==null) continue;
+				node.innerHTML = data[prop];
+			}
+		}
+
+		function resp_handler(status) {
+			return function(data) {
+				if(data["type"] == "upload" && data["percentDone"] == "100") {
+					data["status"] = "success";
+				} else {
+					data["status"] = status;
+				}
+
+				data[data["type"]] = data["currentSpeed"];
+				objToDom(data);
+			};
+		}
+    </script>
+	
+</body>
+</html>
